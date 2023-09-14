@@ -19,7 +19,8 @@ func NewBookServiceImpl(bookRepository repository.BookRepository) BookService {
 
 func (b *BookServiceImpl) Create(ctx context.Context, request request.BookCreateRequest) {
 	book := model.Book{
-		Name: request.Name,
+		BookName: request.BookName,
+		Author: request.Author,
 	}
 	b.BookRepository.Save(ctx, book)
 }
@@ -38,7 +39,7 @@ func (b *BookServiceImpl) FindAll(ctx context.Context) []response.BookResponse {
 	var bookResp []response.BookResponse
 
 	for _, value := range books {
-		book := response.BookResponse{Id: value.Id, Name: value.Name}
+		book := response.BookResponse{Id: value.Id, BookName: value.BookName,Author: value.Author}
 		bookResp = append(bookResp, book)
 	}
 	return bookResp
@@ -56,6 +57,6 @@ func (b *BookServiceImpl) FindById(ctx context.Context, bookId int) response.Boo
 func (b *BookServiceImpl) Update(ctx context.Context, request request.BookUpdateRequest) {
 	book, err := b.BookRepository.FindById(ctx, request.Id)
 	errorhelper.PanicIfErr(err)
-	book.Name = request.Name
+	book.BookName = request.BookName
 	b.BookRepository.Update(ctx, book)
 }

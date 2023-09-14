@@ -32,7 +32,7 @@ func (b *BookRepositoryImpl) FindAll(ctx context.Context) []model.Book  {
 	errorhelper.PanicIfErr(err)
 	defer errorhelper.CommitOrRollback(tx)
 
-	SQL := "select id,name from book"
+	SQL := "select id,bookname,author from book"
 	result,errexec := tx.QueryContext(ctx,SQL)
 	errorhelper.PanicIfErr(errexec)
 	defer result.Close()
@@ -41,7 +41,7 @@ func (b *BookRepositoryImpl) FindAll(ctx context.Context) []model.Book  {
 
 	for result.Next() {
 		book := model.Book{}
-        err := result.Scan(&book.Id,&book.Name)
+        err := result.Scan(&book.Id,&book.BookName,&book.Author)
 		errorhelper.PanicIfErr(err)
 		books = append(books,book)
 	}
@@ -54,7 +54,7 @@ func (b *BookRepositoryImpl) FindById(ctx context.Context, bookId int) (model.Bo
 	errorhelper.PanicIfErr(err)
     defer errorhelper.CommitOrRollback(tx)
 	
-	SQL := " select id,name from book where id =$1"
+	SQL := " select id,bookname,author from book where id =$1"
 	result,errQuery := tx.QueryContext(ctx,SQL,bookId)
 	errorhelper.PanicIfErr(errQuery)
 	defer result.Close()
@@ -62,7 +62,7 @@ func (b *BookRepositoryImpl) FindById(ctx context.Context, bookId int) (model.Bo
 	book := model.Book{}
 
 	if result.Next() {
-		err := result.Scan(&book.Id,&book.Name)
+		err := result.Scan(&book.Id,&book.BookName,&book.Author)
 		errorhelper.PanicIfErr(err)
 		return book,nil
 	}else {
@@ -76,8 +76,8 @@ func (b *BookRepositoryImpl) Save(ctx context.Context, book model.Book) {
   errorhelper.PanicIfErr(err)
   defer errorhelper.CommitOrRollback(tx)
 
-  SQL :=  "insert into book(name) values($1)"
-  _,errExec := tx.ExecContext(ctx,SQL,book.Name)
+  SQL :=  "insert into book(bookname,author) values($1,$2)"
+  _,errExec := tx.ExecContext(ctx,SQL,&book.BookName,&book.Author)
   errorhelper.PanicIfErr(errExec)
 
 }
@@ -88,7 +88,7 @@ func (b *BookRepositoryImpl) Update(ctx context.Context, book model.Book) {
   errorhelper.PanicIfErr(err)
   defer errorhelper.CommitOrRollback(tx)
 
-  SQL := "update book set name=$1 where id=$2"
-  _,errExec := tx.ExecContext(ctx,SQL,book.Name,book.Id)
+  SQL := "update book set bookname=$1,author=$2 where id=$3"
+  _,errExec := tx.ExecContext(ctx,SQL,&book.BookName,&book.Author,book.Id)
   errorhelper.PanicIfErr(errExec)
 }

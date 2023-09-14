@@ -12,9 +12,9 @@ import (
 const (
 	host     = "localhost"
 	port     = 5432
-	user     = ""
-	password = ""
-	dbName   = ""
+	user     = "postgres"
+	password = "tann5827"
+	dbName   = "test"
 )
 
 func DatabaseConnection() *sql.DB {
